@@ -17,11 +17,11 @@ app.get('/weather/:city', function (req, res) {
   request.get(url, function(request, response, body){
       body = JSON.parse(body);
       var sms = 'City: ' + body.name;
-      console.log(sms);
-          sms += ',\nTemp: ' + body.main.temp + "C,\n";
-          console.log(sms);
+      // console.log(sms);
+          sms += ',%0ATemp: ' + body.main.temp + " C,%0A";
+          // console.log(sms);
           sms += 'Weather: ' + body.weather[0].description;
-          console.log(sms);
+          // console.log(sms);
       res.send(sms);
   });
 
@@ -30,6 +30,6 @@ app.get('/weather/:city', function (req, res) {
 
 
 // Server Port Setup
-app.listen(3000, function () {
+app.listen(process.env.PORT || 3000, function () {
   console.log('Now listening on port 3000');
 });
