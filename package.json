@@ -1,0 +1,16 @@
+{
+  "name": "pseudonet",
+  "version": "1.0.0",
+  "description": "A smart SMS based information system",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "express": "^4.14.0",
+    "request": "^2.79.0"
+  }
+}
