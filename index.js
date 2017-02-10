@@ -6,6 +6,8 @@ var app = express();
 var path = require("path");
 app.use(express.static(__dirname + '/src'));
 
+
+// ENDPOINT FOR WEATHER
 app.get('/weather/:city', function (req, res) {
   // openweathermap API key
   const appid = 'ca6ff81b256ad199b3de759c58de182b';
@@ -17,17 +19,35 @@ app.get('/weather/:city', function (req, res) {
   request.get(url, function(request, response, body){
       body = JSON.parse(body);
       var sms = 'City: ' + body.name;
-      // console.log(sms);
           sms += ',%0ATemp: ' + body.main.temp + " C,%0A";
-          // console.log(sms);
           sms += 'Weather: ' + body.weather[0].description;
-          // console.log(sms);
       res.send(sms);
   });
 
 });
 
 
+// ENDPOINT FOR NEARBUY PLACES
+app.get('/nearbuy/:place', function (req, res) {
+  // Google Places API key
+  const API_KEY = 'AIzaSyCdW8DZofdjeJfGNI6jJ1SP5cj3bABLcnI';
+  // Set City
+  var place = req.params.place;
+
+  var url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?key=' + API_KEY + '&query=' + place;
+  // Get weather details
+  request.get(url, function(request, response, body){
+      body = JSON.parse(body);
+      var places = '';
+      for(var i = 0; i < 5; i++){
+        places += body.results[i].name + "\n";
+        places += body.results[i].formatted_address;
+
+      }
+      res.send(places);
+  });
+
+});
 
 // Server Port Setup
 app.listen(process.env.PORT || 3000, function () {
