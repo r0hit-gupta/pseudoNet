@@ -150,6 +150,28 @@ app.get('/directions/:origin/:destination', function (req, res) {
   });
 });
 
+
+
+
+
+// DEVELOPER COMMUNITY FEATURES
+app.get('/ping/:website', function (req, res) {
+  var website = 'http://' + req.params.website;
+  request.get(website, function(error, response, body){
+    // console.log(response.statusCode);
+    if(response){
+      if(response.statusCode == 503)
+      res.send('Website is down');
+      else res.send('Everything seems to be up and running')
+    }
+    res.send('Unknown website');
+  });
+});
+
+
+
+
+
 // Server Port Setup
 app.listen(process.env.PORT || 3000, function () {
   console.log('Now listening on port 3000');
