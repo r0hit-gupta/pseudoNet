@@ -109,6 +109,32 @@ app.get('/cab/:start/:end', function (req, res) {
     });
 });
 
+
+// ENDPOINT FOR NEWS
+app.get('/news', function (req, res) {
+  var API_KEY = 'cb343274ed4b449a922a85c62521b720';
+  var url = 'https://newsapi.org/v1/articles?source=cnbc&apiKey=' + API_KEY;
+  request.get(url, function(error, response, body){
+    body = JSON.parse(body);
+    var articles = body.articles;
+
+    if(articles){
+      // Limit the news to 5
+      var length = articles.length;
+      if(length > 5){
+        length = 5;
+      }
+      var sms = '';
+        for(var i = 0; i < length; i++){
+          // Send only titles of the news
+          sms += articles[i].title + ", " + NEWLINE;
+        }
+        res.send(sms);
+      }
+    });
+});
+
+
 // Server Port Setup
 app.listen(process.env.PORT || 3000, function () {
   console.log('Now listening on port 3000');
