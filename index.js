@@ -261,6 +261,26 @@ app.get('/bus/:source/:destination/:date', function (req, res) {
   });
 });
 
+// ENDPOINT FOR FINDING BEST PRICES
+app.get('/price/:product', function (req, res) {
+  var product = req.params.product;
+  var url = 'http://www.mysmartprice.com/msp/search/msp_search_new.php?s=' + product;
+  var sms = 'bestprice: ';
+  if(product){
+    request.get(url, function(error, response, body){
+      // console.log(body);
+      var $ = cheerio.load(body);
+      $('.prdct-item__dtls').each(function(i, ele){
+        if(i > 4) {
+          return null;
+        }
+        sms += 'Item: ' + $(this).children('a').text().trim() + NEWLINE;
+        sms += 'Price: Rs ' + $(this).children().last().children().last().text() + NEWLINE + NEWLINE;
+      });
+      res.send(sms);
+    });
+  }
+});
 
 
 // DEVELOPER COMMUNITY FEATURES
@@ -353,7 +373,7 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
     if(id){
       DO_api.dropletsDelete(id, (error, response, body) => {
        if(response.statusCode == 204){
-         res.send("Droplet deleted successfully");
+         res.send("deletedroplet: Droplet deleted successfully");
        }
     });
   }
