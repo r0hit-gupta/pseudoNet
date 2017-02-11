@@ -24,7 +24,6 @@ function getCoords(place, callback){
       var coords = {};
       coords.lat = body.results[0].geometry.location.lat;
       coords.lng = body.results[0].geometry.location.lng;
-      console.log("COORDS " + coords.lat);
       callback(coords);
     }
   });
@@ -111,13 +110,20 @@ app.get('/cab/:start/:end', function (req, res) {
         }
         request.get(payload, function(error, response, body){
           body = JSON.parse(body);
+          var prices = {};
           if(body.prices){
-            var prices = body.prices[2];
-            var sms = 'cab: Type: ' + prices.display_name + ", " + NEWLINE;
-                sms += 'Distance: ' + prices.distance + ' kms,' + NEWLINE;
-                sms += 'Estimate: Rs ' + prices.low_estimate + ' - ' + prices.high_estimate + ', ' + NEWLINE;
-                sms += 'Duration: ' + prices.duration/60 + ' mins' + NEWLINE;
-                res.send(sms);
+            for (var i = 0; i < body.prices.length; i++) {
+              if(body.prices[i].display_name == 'uberGO'){
+                prices = body.prices[i];
+                var sms = 'cab: Type: ' + prices.display_name + ", " + NEWLINE;
+                    sms += 'Distance: ' + prices.distance + ' kms,' + NEWLINE;
+                    sms += 'Estimate: Rs ' + prices.low_estimate + ' - ' + prices.high_estimate + ', ' + NEWLINE;
+                    sms += 'Duration: ' + prices.duration/60 + ' mins' + NEWLINE;
+                    res.send(sms);
+                break;
+              }
+            }
+
           }
           res.end("Unable to find cabs");
         });
