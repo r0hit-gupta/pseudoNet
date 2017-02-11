@@ -131,7 +131,6 @@ app.get('/cab/:start/:end', function (req, res) {
     });
 });
 
-
 // ENDPOINT FOR NEWS
 app.get('/news', function (req, res) {
   var API_KEY = 'cb343274ed4b449a922a85c62521b720';
@@ -224,7 +223,6 @@ app.get('/trains/:source/:destination/:date', function (req, res) {
   });
 });
 
-
 // ENDPOINT FOR BUSES BETWEEN TWO STATIONS
 app.get('/bus/:source/:destination/:date', function (req, res) {
   var source = req.params.source;
@@ -265,10 +263,9 @@ app.get('/bus/:source/:destination/:date', function (req, res) {
 app.get('/price/:product', function (req, res) {
   var product = req.params.product;
   var url = 'http://www.mysmartprice.com/msp/search/msp_search_new.php?s=' + product;
-  var sms = 'bestprice: ';
+  var sms = 'price: ';
   if(product){
     request.get(url, function(error, response, body){
-      // console.log(body);
       var $ = cheerio.load(body);
       $('.prdct-item__dtls').each(function(i, ele){
         if(i > 4) {
