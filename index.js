@@ -140,7 +140,13 @@ app.get('/directions/:origin/:destination', function (req, res) {
   request.get(url, function(error, response, body){
     body = JSON.parse(body);
     var sms = '';
-    var directions = body.routes[0].legs[0].steps;
+    var directions = [];
+    if(body.routes[0]){
+      directions = body.routes[0].legs[0].steps;
+    }
+    else {
+      res.send("No directions found");
+    }
     if (directions){
       for(var i = 0; i < directions.length; i++){
         sms += cheerio.load(directions[i].html_instructions.replace('<div', '\n<div')).text() + NEWLINE;
