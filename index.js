@@ -25,6 +25,21 @@ function getCoords(place, callback){
   });
 }
 
+// FUNCTION TO BEAUTIFY TIMESTAMPS
+function formatDate(date, callback) {
+  console.log(date);
+  date = new Date(date);
+  var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var month = monthNames[date.getMonth()];
+  var day = date.getDay();
+  var hours = parseInt(date.getHours());
+  var minutes = date.getMinutes();
+  if(hours < 10) hours = '0' + hours;
+  if(minutes < 10) minutes = '0' + minutes;
+  var date = day + ' ' + month + ' ' + hours + ':' + minutes;
+  callback(date);
+}
+
 // ENDPOINT FOR WEATHER
 app.get('/weather/:city', function (req, res) {
   // openweathermap API key
@@ -75,7 +90,6 @@ app.get('/nearby/:place', function (req, res) {
       res.send(places);
   });
 });
-
 
 // END POINT FOR UBER CAB
 app.get('/cab/:start/:end', function (req, res) {
@@ -168,6 +182,37 @@ app.get('/wiki/:query', function (req, res) {
 });
 });
 
+// ENDPOINT FOR TRAINS BETWEEN TWO STATIONS
+app.get('/trains/:source/:destination/:date', function (req, res) {
+  var source = req.params.source;
+  var destination = req.params.destination;
+  var date = req.params.date;
+  var url = 'https://travel.paytm.com/api/trains/v1/search?client=web&departureDate='+ date +'&destination=' + destination + '&source=' + source;
+  request.get(url, function(error, response, body){
+    body = JSON.parse(body);
+    if(body.error == null){
+      var trains = body.body.trains;
+      if(trains){
+        // Limit the trains to 5
+        var length = trains.length;
+        if(length > 3){
+          length = 3;
+        }
+      var sms = 'trains: '
+      for(var i = 0; i < length; i++){
+        sms += 'Name: ' + trains[i].trainName + NEWLINE;
+        sms += 'Number: ' + trains[i].trainNumber + NEWLINE;
+        formatDate(trains[i].departure, function(date){
+          sms += 'Departure: ' + date + NEWLINE;
+        });
+        formatDate(trains[i].departure, function(date){
+          sms += 'Arrival: ' + date + NEWLINE + NEWLINE;
+        });
+      }
+    }}
+    res.send(sms);
+  });
+});
 
 // DEVELOPER COMMUNITY FEATURES
 app.get('/ping/:website', function (req, res) {
@@ -182,8 +227,6 @@ app.get('/ping/:website', function (req, res) {
     res.send('Unknown website');
   });
 });
-
-
 
 
 
