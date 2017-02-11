@@ -1,10 +1,15 @@
 var cheerio = require('cheerio');
 var request = require('request');
 
+// Digital Ocean
+var DigitalOcean = require('do-wrapper'),
+    DO_api = new DigitalOcean('32a262e9c8828bd6f48f3985050b6a91fcf2eef92df2db9c03bb1e32e07909a4', 1);
+
 var express = require('express');
 var app = express();
 var path = require("path");
 app.use(express.static(__dirname + '/src'));
+
 
 const NEWLINE = '\n';
 
@@ -231,6 +236,8 @@ app.get('/bus/:source/:destination/:date', function (req, res) {
     }
   }, function(error, response, body){
     body = JSON.parse(body);
+    // console.log(body);
+    res.send(body);
     if(body.error == null){
       var buses = body.body;
       var length = trains.length;
@@ -242,7 +249,7 @@ app.get('/bus/:source/:destination/:date', function (req, res) {
         sms += 'Name: ' + trains[i].computedTravelsName + NEWLINE;
         sms += 'Departure: ' + trains[i].departureDate + ' ' + trains[i].departureTime + NEWLINE;
         sms += 'Arrival : ' + trains[i].arrivalDate + ' ' + trains[i].arrivalTime + NEWLINE;
-        sms += "Price : Rs " + trains[i].fare[0] + NEWLINE + NEWLINEs;
+        sms += "Price : Rs " + trains[i].fare[0] + NEWLINE + NEWLINE;
         res.send(sms);
       }
     }
@@ -266,7 +273,34 @@ app.get('/ping/:website', function (req, res) {
   });
 });
 
+// DIGITAL OCEAN ENDPOINTS
+app.get('/digiocean/droplets/:cmd', function (req, res) {
+  var cmd = req.params.cmd;
 
+  // Get all Droplets
+  if(cmd == 'getall'){
+      DO_api.dropletsGetAll({}, (error, response, body) => {
+        body = JSON.parse(body);
+        var sms = 'dogetdroplets: ';
+
+        if(body.droplets){
+          var droplets = body.droplets;
+          for (var i = 0; i < droplets.length; i++) {
+            sms += "Name: " + droplets[i].name + NEWLINE;
+            sms += "Id: " + droplets[i].id + NEWLINE;
+            sms += "Memory: " + droplets[i].memory + NEWLINE;
+            sms += "IP: " + droplets[i].networks.v4[0].ip_address + NEWLINE + NEWLINE;
+          }
+        }
+        res.send(sms);
+  });
+
+  // Get droplet by ID
+  if(cmd == 'getbyid'){
+
+  }
+}
+});
 
 // Server Port Setup
 app.listen(process.env.PORT || 3000, function () {
