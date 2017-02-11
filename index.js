@@ -6,7 +6,7 @@ var app = express();
 var path = require("path");
 app.use(express.static(__dirname + '/src'));
 
-const NEWLINE = '%0a';
+const NEWLINE = '\n';
 
 // FUNCTION TO GET LATTITUDE LONGITUDE FOR A PLACE
 function getCoords(place, callback){
@@ -53,7 +53,7 @@ app.get('/nearbuy/:place', function (req, res) {
   // Get weather details
   request.get(url, function(error, response, body){
       body = JSON.parse(body);
-      var places = '';
+      var places = 'nearbuy: ';
       // Length of the results
       var length = body.results.length;
 
@@ -95,7 +95,7 @@ app.get('/cab/:start/:end', function (req, res) {
           body = JSON.parse(body);
           if(body.prices){
             var prices = body.prices[2];
-            var sms = 'Type: ' + prices.display_name + ", " + NEWLINE;
+            var sms = 'cab: Type: ' + prices.display_name + ", " + NEWLINE;
                 sms += 'Distance: ' + prices.distance + ' kms,' + NEWLINE;
                 sms += 'Estimate: Rs ' + prices.low_estimate + ' - ' + prices.high_estimate + ', ' + NEWLINE;
                 sms += 'Duration: ' + prices.duration/60 + ' mins' + NEWLINE;
@@ -122,7 +122,7 @@ app.get('/news', function (req, res) {
       if(length > 5){
         length = 5;
       }
-      var sms = '';
+      var sms = 'news: ';
         for(var i = 0; i < length; i++){
           // Send only titles of the news
           sms += articles[i].title + ", " + NEWLINE;
