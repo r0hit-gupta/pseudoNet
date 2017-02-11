@@ -125,7 +125,7 @@ app.get('/news', function (req, res) {
       var sms = 'news: ';
         for(var i = 0; i < length; i++){
           // Send only titles of the news
-          sms += articles[i].title + ", " + NEWLINE;
+          sms += i+1 + ". " + articles[i].title + ", " + NEWLINE + NEWLINE;
         }
         res.send(sms);
       }
@@ -133,6 +133,24 @@ app.get('/news', function (req, res) {
 });
 
 
+// ENDPOINT FOR DIRECTIONS
+app.get('/directions/:origin/:destination', function (req, res) {
+  var origin = req.params.origin;
+  var destination = req.params.destination;
+  var url = 'http://maps.googleapis.com/maps/api/directions/json?origin=' + origin + '&destination=' + destination + '&sensor=false';
+  request.get(url, function(error, response, body){
+    body = JSON.parse(body);
+    var sms = '';
+    var directions = body.routes[0].legs[0].steps;
+    if (directions){
+      for(var i = 0; i < directions.length; i++){
+        sms += cheerio.load(directions[i].html_instructions).text() + '<br>';
+      }
+    }
+
+    res.send(sms);
+  });
+});
 // Server Port Setup
 app.listen(process.env.PORT || 3000, function () {
   console.log('Now listening on port 3000');
