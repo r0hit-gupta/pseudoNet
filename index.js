@@ -6,6 +6,8 @@ var app = express();
 var path = require("path");
 app.use(express.static(__dirname + '/src'));
 
+const NEWLINE = '\n';
+
 // FUNCTION TO GET LATTITUDE LONGITUDE FOR A PLACE
 function getCoords(place){
   // Google Maps API Key
@@ -33,8 +35,8 @@ app.get('/weather/:city', function (req, res) {
   // Get weather details
   request.get(url, function(request, response, body){
       body = JSON.parse(body);
-      var sms = 'City: ' + body.name;
-          sms += ',%0ATemp: ' + body.main.temp + " C,%0A";
+      var sms = 'City: ' + body.name + ', ' + NEWLINE;
+          sms += 'Temp: ' + body.main.temp + " C, " + NEWLINE;
           sms += 'Weather: ' + body.weather[0].description;
       res.send(sms);
   });
@@ -64,8 +66,8 @@ app.get('/nearbuy/:place', function (req, res) {
       }
       // Create a string of the results.
       for(var i = 0; i < length; i++){
-        places += body.results[i].name + "\n";
-        places += body.results[i].formatted_address + ", ";
+        places += body.results[i].name + NEWLINE ;
+        places += body.results[i].formatted_address + "," + NEWLINE;
 
       }
       // Send the results
