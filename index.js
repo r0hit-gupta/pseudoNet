@@ -1,6 +1,8 @@
 var cheerio = require('cheerio');
 var request = require('request');
 
+var sync = require('synchronize');
+
 var express = require('express');
 var app = express();
 var path = require("path");
@@ -9,7 +11,7 @@ app.use(express.static(__dirname + '/src'));
 const NEWLINE = '\n';
 
 // FUNCTION TO GET LATTITUDE LONGITUDE FOR A PLACE
-function getCoords(place){
+function getCoords(place, callback){
   // Google Maps API Key
   const API_KEY = 'AIzaSyAtx_lIJ0GsFLKtlaCsMyo7K7Rq8IeTCx4';
   var url = 'https://maps.googleapis.com/maps/api/geocode/json?address='+place+'&key='+API_KEY;
@@ -19,7 +21,8 @@ function getCoords(place){
       var coords = {};
       coords.lat = body.results[0].geometry.location.lat;
       coords.lng = body.results[0].geometry.location.lng;
-      return coords;
+      console.log("COORDS " + coords.lat);
+      callback(coords);
     }
   });
 }
@@ -33,7 +36,7 @@ app.get('/weather/:city', function (req, res) {
   // Create a GET url with the parameters
   var url = 'http://api.openweathermap.org/data/2.5/weather?units=metric&appid=' + appid + '&q=' + city;
   // Get weather details
-  request.get(url, function(request, response, body){
+  request.get(url, function(error, response, body){
       body = JSON.parse(body);
       var sms = 'City: ' + body.name + ', ' + NEWLINE;
           sms += 'Temp: ' + body.main.temp + " C, " + NEWLINE;
@@ -50,7 +53,7 @@ app.get('/nearbuy/:place', function (req, res) {
   var place = req.params.place;
   var url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?key=' + API_KEY + '&query=' + place;
   // Get weather details
-  request.get(url, function(request, response, body){
+  request.get(url, function(error, response, body){
       body = JSON.parse(body);
       var places = '';
       // Length of the results
@@ -73,7 +76,37 @@ app.get('/nearbuy/:place', function (req, res) {
       // Send the results
       res.send(places);
   });
+});
 
+
+// END POINT FOR UBER CAB
+app.get('/cab/:start/:end', function (req, res) {
+  // Uber Token
+    var TOKEN = 'HAt9gID7pnvbLmWxn0cpd_RRjGXOWuJOqWwymqgq';
+    getCoords(req.params.start, function(start){
+      getCoords(req.params.end, function(end){
+        var payload = {
+          url: 'https://api.uber.com/v1.2/estimates/price?start_latitude=' + start.lat + '&start_longitude=' + start.lng + '&end_latitude=' + end.lat + '&end_longitude=' + end.lng,
+          headers: {
+            Authorization: 'Token ' + TOKEN,
+            'Accept-Language': 'en_US',
+            'Content-Type': 'application/json'
+          }
+        }
+        request.get(payload, function(error, response, body){
+          body = JSON.parse(body);
+          if(body.prices){
+            var prices = body.prices[2];
+            var sms = 'Type: ' + prices.display_name + ", " + NEWLINE;
+                sms += 'Distance: ' + prices.distance + ' kms,' + NEWLINE;
+                sms += 'Estimate: Rs ' + prices.low_estimate + ' - ' + prices.high_estimate + ', ' + NEWLINE;
+                sms += 'Duration: ' + prices.duration/60 + ' mins' + NEWLINE;
+                res.send(sms);
+          }
+          res.end("Unable to find cabs");
+        });
+      });
+    });
 });
 
 // Server Port Setup
