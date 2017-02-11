@@ -38,7 +38,7 @@ app.get('/weather/:city', function (req, res) {
       body = JSON.parse(body);
       var sms = 'City: ' + body.name + ', ' + NEWLINE;
           sms += 'Temp: ' + body.main.temp + " C, " + NEWLINE;
-          sms += 'Weather: ' + body.weather[0].description;
+          sms += 'Weather: ' + body.weather[0].main;
       res.send(sms);
   });
 });
