@@ -162,7 +162,8 @@ app.get('/wiki/:query', function (req, res) {
   var url = 'https://en.wikipedia.org/wiki/' + query;
   request.get(url, function(error, response, body){
     var $ = cheerio.load(body)
-    body = $('#bodyContent').children().first().text();
+    $('sup').remove();
+    body = $('p').first().text();
     res.send(body);
 });
 });
