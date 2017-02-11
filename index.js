@@ -44,7 +44,7 @@ app.get('/weather/:city', function (req, res) {
 });
 
 // ENDPOINT FOR NEARBUY PLACES
-app.get('/nearbuy/:place', function (req, res) {
+app.get('/nearby/:place', function (req, res) {
   // Google Places API key
   const API_KEY = 'AIzaSyCdW8DZofdjeJfGNI6jJ1SP5cj3bABLcnI';
   // Set City
@@ -53,7 +53,7 @@ app.get('/nearbuy/:place', function (req, res) {
   // Get weather details
   request.get(url, function(error, response, body){
       body = JSON.parse(body);
-      var places = 'nearbuy: ';
+      var places = 'nearby: ';
       // Length of the results
       var length = body.results.length;
 
