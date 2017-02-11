@@ -13,10 +13,11 @@ function getCoords(place){
   var url = 'https://maps.googleapis.com/maps/api/geocode/json?address='+place+'&key='+API_KEY;
   request.get(url, function(req, res, body){
     body = JSON.parse(body);
-    return body;
-    return {
-      lat: body.results[0].geometry.location.lat,
-      long: body.results[0].geometry.location.long
+    if (body.results){
+      var coords = {};
+      coords.lat = body.results[0].geometry.location.lat;
+      coords.lng = body.results[0].geometry.location.lng;
+      return coords;
     }
   });
 }
@@ -27,7 +28,7 @@ app.get('/weather/:city', function (req, res) {
   const appid = 'ca6ff81b256ad199b3de759c58de182b';
   // Set City
   var city = req.params.city;
-
+  // Create a GET url with the parameters
   var url = 'http://api.openweathermap.org/data/2.5/weather?units=metric&appid=' + appid + '&q=' + city;
   // Get weather details
   request.get(url, function(request, response, body){
@@ -37,9 +38,7 @@ app.get('/weather/:city', function (req, res) {
           sms += 'Weather: ' + body.weather[0].description;
       res.send(sms);
   });
-
 });
-
 
 // ENDPOINT FOR NEARBUY PLACES
 app.get('/nearbuy/:place', function (req, res) {
@@ -47,17 +46,29 @@ app.get('/nearbuy/:place', function (req, res) {
   const API_KEY = 'AIzaSyCdW8DZofdjeJfGNI6jJ1SP5cj3bABLcnI';
   // Set City
   var place = req.params.place;
-  console.log(getCoords(place));
   var url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?key=' + API_KEY + '&query=' + place;
   // Get weather details
   request.get(url, function(request, response, body){
       body = JSON.parse(body);
       var places = '';
-      for(var i = 0; i < 5; i++){
+      // Length of the results
+      var length = body.results.length;
+
+      // If no results are found
+      if(body.results.length == 0){
+        res.send("Nothing Found");
+      }
+      // Limit the search results to 5
+      if(body.results.length > 5){
+        length = 5;
+      }
+      // Create a string of the results.
+      for(var i = 0; i < length; i++){
         places += body.results[i].name + "\n";
-        places += body.results[i].formatted_address;
+        places += body.results[i].formatted_address + ", ";
 
       }
+      // Send the results
       res.send(places);
   });
 
