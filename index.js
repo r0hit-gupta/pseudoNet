@@ -182,7 +182,7 @@ app.get('/wiki/:query', function (req, res) {
     var $ = cheerio.load(body)
     $('sup').remove();
     body = $('p').first().text();
-    res.send(body);
+    res.send('wiki: ' + body);
 });
 });
 
@@ -358,8 +358,14 @@ if(cmd == 'action'){
   var id = req.query.id;
   var type = req.query.type;
   if(id){
+    var options = {
+      type: type
+    };
+    if(type == 'snapshot'){
+      options.name = req.query.name;
+    }
     var sms = 'action: '
-    DO_api.dropletsRequestAction(id, {type: type}, (error, response, body) => {
+    DO_api.dropletsRequestAction(id, options, (error, response, body) => {
       sms += 'Action: ' + body.action.type + NEWLINE;
       sms += 'Status: ' + body.action.status + NEWLINE;
       res.send(sms);
