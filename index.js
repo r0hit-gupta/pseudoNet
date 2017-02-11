@@ -67,8 +67,8 @@ app.get('/nearby/:place', function (req, res) {
       }
       // Create a string of the results.
       for(var i = 0; i < length; i++){
-        places += body.results[i].name + NEWLINE ;
-        places += body.results[i].formatted_address + "," + NEWLINE;
+        places += i+1 + ". " + body.results[i].name + NEWLINE ;
+        places += body.results[i].formatted_address + NEWLINE + NEWLINE;
 
       }
       // Send the results
@@ -132,7 +132,6 @@ app.get('/news', function (req, res) {
     });
 });
 
-
 // ENDPOINT FOR DIRECTIONS
 app.get('/directions/:origin/:destination', function (req, res) {
   var origin = req.params.origin;
@@ -144,13 +143,13 @@ app.get('/directions/:origin/:destination', function (req, res) {
     var directions = body.routes[0].legs[0].steps;
     if (directions){
       for(var i = 0; i < directions.length; i++){
-        sms += cheerio.load(directions[i].html_instructions).text() + '<br>';
+        sms += cheerio.load(directions[i].html_instructions.replace('<div', '\n<div')).text() + NEWLINE;
       }
     }
-
     res.send(sms);
   });
 });
+
 // Server Port Setup
 app.listen(process.env.PORT || 3000, function () {
   console.log('Now listening on port 3000');
