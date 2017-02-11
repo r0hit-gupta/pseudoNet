@@ -237,6 +237,7 @@ app.get('/bus/:source/:destination/:date', function (req, res) {
   }, function(error, response, body){
     if(body.error == null){
       var buses = body.body;
+      // res.send(buses);
       var length = buses.length;
       if(length > 3){
         length = 3;
@@ -247,8 +248,8 @@ app.get('/bus/:source/:destination/:date', function (req, res) {
         sms += 'Departure: ' + buses[i].departureDate + ' ' + buses[i].departureTime + NEWLINE;
         sms += 'Arrival : ' + buses[i].arrivalDate + ' ' + buses[i].arrivalTime + NEWLINE;
         sms += "Price : Rs " + buses[i].fare[0] + NEWLINE + NEWLINE;
-        res.send(sms);
       }
+      res.send(sms);
     }
     res.send("No Buses Found");
   });
@@ -285,6 +286,7 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
             sms += "Name: " + droplets[i].name + NEWLINE;
             sms += "Id: " + droplets[i].id + NEWLINE;
             sms += "Memory: " + droplets[i].memory + NEWLINE;
+            sms += 'Status: ' + droplets[i].status + NEWLINE;
             sms += "IP: " + droplets[i].networks.v4[0].ip_address + NEWLINE + NEWLINE;
           }
         }
@@ -297,13 +299,16 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
     if(id){
       var sms = 'dropletbyid: ';
       DO_api.dropletsGetById(id, (error, response, body) => {
+        if(!error){
           sms += 'Id: ' + body.droplet.id + NEWLINE;
           sms += 'Name : ' + body.droplet.name + NEWLINE;
           sms += 'Status: ' + body.droplet.status + NEWLINE;
           sms += 'IP: ' + body.droplet.networks.v4[0].ip_address + NEWLINE;
           res.send(sms);
+        }
       });
     }
+    else
     res.send('Please provide a valid id');
   }
 
@@ -314,8 +319,8 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
     var size = req.query.size;
     var image = req.query.image;
 
-    if(name && region && size){
-      var sms = 'creatdroplet: Droplet created successfully' + NEWLINE;
+    if(name && region && size && image){
+      var sms = 'createdroplet: Droplet created successfully' + NEWLINE;
       var options = {
         name: name,
         region: region,
@@ -323,14 +328,16 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
         image: image
       };
       DO_api.dropletsCreate(options, (error, response, body) => {
-        res.send(body);
-        sms += 'Id: ' + body.droplet.id + NEWLINE;
-        sms += 'Name : ' + body.droplet.name + NEWLINE;
-        sms += 'Status: ' + body.droplet.status + NEWLINE;
-        sms += 'IP: ' + body.droplet.networks.v4[0].ip_address + NEWLINE;
-        // res.send(sms);
+        // console.log(error);
+        if(error == null){
+          sms += 'Id: ' + body.droplet.id + NEWLINE;
+          sms += 'Name : ' + body.droplet.name + NEWLINE;
+          sms += 'Status: ' + body.droplet.status + NEWLINE;
+          res.send(sms);
+      }
       });
     }
+    else
     res.send("Please send valid options");
   }
 
@@ -344,6 +351,21 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
        }
     });
   }
+}
+
+// Droplet Actions
+if(cmd == 'action'){
+  var id = req.query.id;
+  var type = req.query.type;
+  if(id){
+    var sms = 'action: '
+    DO_api.dropletsRequestAction(id, {type: type}, (error, response, body) => {
+      sms += 'Action: ' + body.action.type + NEWLINE;
+      sms += 'Status: ' + body.action.status + NEWLINE;
+      res.send(sms);
+  });
+}
+  else res.send("Please send valid action or id");
 }
 
 });
