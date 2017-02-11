@@ -6,7 +6,7 @@ var app = express();
 var path = require("path");
 app.use(express.static(__dirname + '/src'));
 
-const NEWLINE = '\n';
+const NEWLINE = '%0A';
 
 // FUNCTION TO GET LATTITUDE LONGITUDE FOR A PLACE
 function getCoords(place, callback){
