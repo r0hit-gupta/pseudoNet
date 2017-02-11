@@ -125,7 +125,7 @@ app.get('/news', function (req, res) {
       var sms = 'news: ';
         for(var i = 0; i < length; i++){
           // Send only titles of the news
-          sms += i+1 + ". " + articles[i].title + ", " + NEWLINE + NEWLINE;
+          sms += i+1 + ". " + articles[i].title + NEWLINE + NEWLINE;
         }
         res.send(sms);
       }
