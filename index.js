@@ -157,7 +157,7 @@ app.get('/directions/:origin/:destination', function (req, res) {
   var url = 'http://maps.googleapis.com/maps/api/directions/json?origin=' + origin + '&destination=' + destination + '&sensor=false';
   request.get(url, function(error, response, body){
     body = JSON.parse(body);
-    var sms = '';
+    var sms = 'directions: ';
     var directions = [];
     if(body.routes[0]){
       directions = body.routes[0].legs[0].steps;
@@ -235,21 +235,18 @@ app.get('/bus/:source/:destination/:date', function (req, res) {
       src_display_name: source
     }
   }, function(error, response, body){
-    body = JSON.parse(body);
-    // console.log(body);
-    res.send(body);
     if(body.error == null){
       var buses = body.body;
-      var length = trains.length;
+      var length = buses.length;
       if(length > 3){
         length = 3;
       }
       var sms = 'bus: ';
       for(var i = 0; i < length; i++){
-        sms += 'Name: ' + trains[i].computedTravelsName + NEWLINE;
-        sms += 'Departure: ' + trains[i].departureDate + ' ' + trains[i].departureTime + NEWLINE;
-        sms += 'Arrival : ' + trains[i].arrivalDate + ' ' + trains[i].arrivalTime + NEWLINE;
-        sms += "Price : Rs " + trains[i].fare[0] + NEWLINE + NEWLINE;
+        sms += 'Name: ' + buses[i].computedTravelsName + NEWLINE;
+        sms += 'Departure: ' + buses[i].departureDate + ' ' + buses[i].departureTime + NEWLINE;
+        sms += 'Arrival : ' + buses[i].arrivalDate + ' ' + buses[i].arrivalTime + NEWLINE;
+        sms += "Price : Rs " + buses[i].fare[0] + NEWLINE + NEWLINE;
         res.send(sms);
       }
     }
@@ -280,8 +277,7 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
   // Get all Droplets
   if(cmd == 'getall'){
       DO_api.dropletsGetAll({}, (error, response, body) => {
-        body = JSON.parse(body);
-        var sms = 'dogetdroplets: ';
+        var sms = 'getdroplets: ';
 
         if(body.droplets){
           var droplets = body.droplets;
@@ -294,12 +290,62 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
         }
         res.send(sms);
   });
-
+}
   // Get droplet by ID
   if(cmd == 'getbyid'){
+    var id = req.query.id;
+    if(id){
+      var sms = 'dropletbyid: ';
+      DO_api.dropletsGetById(id, (error, response, body) => {
+          sms += 'Id: ' + body.droplet.id + NEWLINE;
+          sms += 'Name : ' + body.droplet.name + NEWLINE;
+          sms += 'Status: ' + body.droplet.status + NEWLINE;
+          sms += 'IP: ' + body.droplet.networks.v4[0].ip_address + NEWLINE;
+          res.send(sms);
+      });
+    }
+    res.send('Please provide a valid id');
+  }
 
+  // Create droplet
+  if(cmd == 'create'){
+    var name = req.query.name;
+    var region = req.query.region;
+    var size = req.query.size;
+    var image = req.query.image;
+
+    if(name && region && size){
+      var sms = 'creatdroplet: Droplet created successfully' + NEWLINE;
+      var options = {
+        name: name,
+        region: region,
+        size: size,
+        image: image
+      };
+      DO_api.dropletsCreate(options, (error, response, body) => {
+        res.send(body);
+        sms += 'Id: ' + body.droplet.id + NEWLINE;
+        sms += 'Name : ' + body.droplet.name + NEWLINE;
+        sms += 'Status: ' + body.droplet.status + NEWLINE;
+        sms += 'IP: ' + body.droplet.networks.v4[0].ip_address + NEWLINE;
+        // res.send(sms);
+      });
+    }
+    res.send("Please send valid options");
+  }
+
+  // Delete droplet
+  if(cmd == 'delete'){
+    var id = req.query.id;
+    if(id){
+      DO_api.dropletsDelete(id, (error, response, body) => {
+       if(response.statusCode == 204){
+         res.send("Droplet deleted successfully");
+       }
+    });
   }
 }
+
 });
 
 // Server Port Setup
