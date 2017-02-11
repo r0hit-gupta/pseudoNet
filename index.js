@@ -84,7 +84,6 @@ app.get('/nearby/:place', function (req, res) {
       for(var i = 0; i < length; i++){
         places += i+1 + ". " + body.results[i].name + NEWLINE ;
         places += body.results[i].formatted_address + NEWLINE + NEWLINE;
-
       }
       // Send the results
       res.send(places);
@@ -205,7 +204,7 @@ app.get('/trains/:source/:destination/:date', function (req, res) {
         formatDate(trains[i].departure, function(date){
           sms += 'Departure: ' + date + NEWLINE;
         });
-        formatDate(trains[i].departure, function(date){
+        formatDate(trains[i].arrival, function(date){
           sms += 'Arrival: ' + date + NEWLINE + NEWLINE;
         });
       }
@@ -213,6 +212,45 @@ app.get('/trains/:source/:destination/:date', function (req, res) {
     res.send(sms);
   });
 });
+
+
+// ENDPOINT FOR BUSES BETWEEN TWO STATIONS
+app.get('/bus/:source/:destination/:date', function (req, res) {
+  var source = req.params.source;
+  var destination = req.params.destination;
+  var date = req.params.date;
+
+  var url = 'https://tickets.paytm.com/v2/search?child_site_id=1&site_id=1&client=web';
+  request.post({
+    url: url,
+    json: true,
+    body: {
+      date: date,
+      dest_display_name: destination,
+      src_display_name: source
+    }
+  }, function(error, response, body){
+    body = JSON.parse(body);
+    if(body.error == null){
+      var buses = body.body;
+      var length = trains.length;
+      if(length > 3){
+        length = 3;
+      }
+      var sms = 'bus: ';
+      for(var i = 0; i < length; i++){
+        sms += 'Name: ' + trains[i].computedTravelsName + NEWLINE;
+        sms += 'Departure: ' + trains[i].departureDate + ' ' + trains[i].departureTime + NEWLINE;
+        sms += 'Arrival : ' + trains[i].arrivalDate + ' ' + trains[i].arrivalTime + NEWLINE;
+        sms += "Price : Rs " + trains[i].fare[0] + NEWLINE + NEWLINEs;
+        res.send(sms);
+      }
+    }
+    res.send("No Buses Found");
+  });
+});
+
+
 
 // DEVELOPER COMMUNITY FEATURES
 app.get('/ping/:website', function (req, res) {
