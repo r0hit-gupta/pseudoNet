@@ -156,16 +156,24 @@ app.get('/directions/:origin/:destination', function (req, res) {
   });
 });
 
-
-
+// ENDPOINT FOR WIKIPEDIA
+app.get('/wiki/:query', function (req, res) {
+  var query = req.params.query;
+  var url = 'https://en.wikipedia.org/wiki/' + query;
+  request.get(url, function(error, response, body){
+    var $ = cheerio.load(body)
+    body = $('#bodyContent').children().first().text();
+    res.send(body);
+});
+});
 
 
 // DEVELOPER COMMUNITY FEATURES
 app.get('/ping/:website', function (req, res) {
   var website = 'http://' + req.params.website;
   request.get(website, function(error, response, body){
-    // console.log(response.statusCode);
-    if(response){
+
+    if(!error && response){
       if(response.statusCode == 503)
       res.send('Website is down');
       else res.send('Everything seems to be up and running')
