@@ -62,7 +62,7 @@ app.get('/weather/:city', function (req, res) {
   });
 });
 
-// ENDPOINT FOR NEARBUY PLACES
+// ENDPOINT FOR NEARBY PLACES
 app.get('/nearby/:place', function (req, res) {
   // Google Places API key
   const API_KEY = 'AIzaSyCdW8DZofdjeJfGNI6jJ1SP5cj3bABLcnI';
@@ -351,7 +351,6 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
         image: image
       };
       DO_api.dropletsCreate(options, (error, response, body) => {
-        // console.log(error);
         if(error == null){
           sms += 'Id: ' + body.droplet.id + NEWLINE;
           sms += 'Name : ' + body.droplet.name + NEWLINE;
