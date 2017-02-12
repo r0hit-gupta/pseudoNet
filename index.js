@@ -302,7 +302,7 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
   if(cmd == 'getall'){
       DO_api.dropletsGetAll({}, (error, response, body) => {
         var sms = 'getdroplets: ';
-
+        console.log(body.droplets);
         if(body.droplets){
           var droplets = body.droplets;
           for (var i = 0; i < droplets.length; i++) {
