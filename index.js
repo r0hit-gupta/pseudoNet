@@ -268,7 +268,7 @@ app.get('/price/:product', function (req, res) {
     request.get(url, function(error, response, body){
       var $ = cheerio.load(body);
       $('.prdct-item__dtls').each(function(i, ele){
-        if(i > 4) {
+        if(i > 2) {
           return null;
         }
         sms += 'Item: ' + $(this).children('a').text().trim() + NEWLINE;
