@@ -3,7 +3,7 @@ var request = require('request');
 
 // Digital Ocean
 var DigitalOcean = require('do-wrapper'),
-    DO_api = new DigitalOcean('32a262e9c8828bd6f48f3985050b6a91fcf2eef92df2db9c03bb1e32e07909a4', 1);
+    DO_api = new DigitalOcean('32a262e9c8828bd6f48f3985050b6a91fcf2eef92df2db9c03bb1e32e07909a4', 5);
 
 var express = require('express');
 var app = express();
@@ -302,7 +302,7 @@ app.get('/digiocean/droplets/:cmd', function (req, res) {
   if(cmd == 'getall'){
       DO_api.dropletsGetAll({}, (error, response, body) => {
         var sms = 'getdroplets: ';
-        console.log(body.droplets);
+        console.log(body);
         if(body.droplets){
           var droplets = body.droplets;
           for (var i = 0; i < droplets.length; i++) {
