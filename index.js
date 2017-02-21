@@ -14,7 +14,7 @@ var path = require("path");
 var serveIndex = require('serve-index');
 
 app.use(express.static(__dirname + "/"))
-app.use('/downloads', serveIndex(__dirname + '/downloads'));
+app.use('/downloads', serveIndex(__dirname + '../downloads'));
 
 const NEWLINE = '\n';
 
