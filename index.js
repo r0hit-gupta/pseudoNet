@@ -8,13 +8,7 @@ var DigitalOcean = require('do-wrapper'),
 var express = require('express');
 var app = express();
 var path = require("path");
-// app.use(express.static(__dirname + '/do'));
-
-// Index files
-var serveIndex = require('serve-index');
-
-app.use(express.static(__dirname + "/"))
-app.use('/downloads', serveIndex(__dirname + '../downloads'));
+app.use(express.static(__dirname + '/'));
 
 const NEWLINE = '\n';
 
@@ -401,6 +395,12 @@ if(cmd == 'action'){
   else res.send("Please send valid action or id");
 }
 
+});
+
+
+// Download file
+app.get('/download', function (req, res) {
+  res.download('../downloads/OnePlus2Oxygen_14_OTA_027_all_1612271635_392be0370d60420e.zip');
 });
 
 // Server Port Setup
