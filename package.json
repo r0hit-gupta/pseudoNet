@@ -12,6 +12,7 @@
     "cheerio": "^0.22.0",
     "do-wrapper": "^3.11.1",
     "express": "^4.14.0",
-    "request": "^2.79.0"
+    "request": "^2.79.0",
+    "serve-index": "^1.8.0"
   }
 }

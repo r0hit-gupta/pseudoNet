@@ -8,8 +8,13 @@ var DigitalOcean = require('do-wrapper'),
 var express = require('express');
 var app = express();
 var path = require("path");
-app.use(express.static(__dirname + '/src'));
+// app.use(express.static(__dirname + '/do'));
 
+// Index files
+var serveIndex = require('serve-index');
+
+app.use(express.static(__dirname + "/"))
+app.use('/downloads', serveIndex(__dirname + '/downloads'));
 
 const NEWLINE = '\n';
 
