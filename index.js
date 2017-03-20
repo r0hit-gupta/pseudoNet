@@ -397,12 +397,6 @@ if(cmd == 'action'){
 
 });
 
-
-// Download file
-app.get('/download', function (req, res) {
-  res.download('../downloads/OnePlus2Oxygen_14_OTA_027_all_1612271635_392be0370d60420e.zip');
-});
-
 // Server Port Setup
 app.listen(8081, function () {
   console.log('Now listening on port 8081');
